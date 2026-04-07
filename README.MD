@@ -33,7 +33,15 @@ Como consequência, ocorre:
 
 O projeto busca **resolver esse problema por meio de uma solução tecnológica**, facilitando a divulgação, descoberta e organização de eventos na Arena Pernambuco.
 
-## Entrega 1
+## 🧑‍💻 Equipe
+* Marcello Augusto
+* Matheus Conolly
+* Luiz Felipe 
+* Luiz Henrique 
+* Pedro Armando  
+* Paulo Nery
+
+# Entrega 1
 
 ## 🎨 Protótipo no Figma
 
@@ -53,13 +61,14 @@ Clique na imagem abaixo abaixo para visualizar.
 
 [![Google Docs](https://img.shields.io/badge/Histórias%20de%20Usuário-Google%20Docs-blue?style=for-the-badge&logo=googledocs&logoColor=white)](https://docs.google.com/document/d/1pr9lrvJhAbzC1pVu2YAyu88P86T6NZQV/edit?usp=sharing)
 
-## 🧑‍💻 Equipe
-* Marcello Augusto
-* Matheus Conolly
-* Luiz Felipe 
-* Luiz Henrique 
-* Pedro Armando  
-* Paulo Nery
+# Entrega 2
+
+## 📺  Screencast
+👉 **[Demo](https://youtu.be/HBw482dQmb0?si=TTZNCfSk2JqGlnu0)**
+
+## 📸 Bug Tracker
+
+👉 **[Ver print da tela](https://i.ibb.co/CKfSdsMt/image.png)**
 
 
 
