@@ -3,6 +3,7 @@ package com.arenape.webapi.security;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -12,18 +13,21 @@ import java.util.Date;
 @Service
 public class JwtService {
 
-    private static final String SECRET = "minha-chave-secreta-super-segura-minimo-256bits!!";
-    private static final long EXPIRATION_MS = 1000 * 60 * 60 * 24; // 24 horas
+    @Value("${jwt.secret}")
+    private String secret;
+
+    @Value("${jwt.expiration-ms}")
+    private long expirationMs;
 
     private SecretKey getKey() {
-        return Keys.hmacShaKeyFor(SECRET.getBytes());
+        return Keys.hmacShaKeyFor(secret.getBytes());
     }
 
     public String generateToken(UserDetails user) {
         return Jwts.builder()
                 .subject(user.getUsername())
                 .issuedAt(new Date())
-                .expiration(new Date(System.currentTimeMillis() + EXPIRATION_MS))
+                .expiration(new Date(System.currentTimeMillis() + expirationMs))
                 .signWith(getKey())
                 .compact();
     }

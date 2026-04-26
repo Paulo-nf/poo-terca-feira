@@ -23,7 +23,6 @@ public class EventService {
     }
 
     public EventResponseDTO create(EventRequestDTO request) {
-
         Event event = new Event();
         event.setName(request.name());
         event.setLocation(request.location());
@@ -32,7 +31,7 @@ public class EventService {
         event.setPrice(request.price());
         event.setAvailableTickets(request.availableTickets());
         event.setEventDate(request.eventDate());
-        event.setStatus(EventStatus.PENDING);
+        event.setStatus(EventStatus.PENDING); // criação sempre inicia como PENDING
 
         return toDTO(repository.save(event));
     }
@@ -58,6 +57,11 @@ public class EventService {
             throw new BusinessException("A data do evento deve ser no futuro");
         }
 
+        if (request.status() != null) {
+            validateStatusTransition(event.getStatus(), request.status());
+            event.setStatus(request.status());
+        }
+
         event.setName(request.name());
         event.setLocation(request.location());
         event.setDescription(request.description());
@@ -80,6 +84,20 @@ public class EventService {
     }
 
     // ─── Helpers ────────────────────────────────────────────────────────────────
+
+    private void validateStatusTransition(EventStatus current, EventStatus next) {
+        boolean invalid = switch (current) {
+            case PENDING    -> next == EventStatus.PENDING;   // já está, não faz sentido
+            case CONFIRMED  -> next == EventStatus.PENDING;   // não pode regredir
+            case CANCELLED  -> true;                          // evento cancelado não aceita mudanças
+        };
+
+        if (invalid) {
+            throw new BusinessException(
+                "Transição de status inválida: " + current + " → " + next
+            );
+        }
+    }
 
     private Event findEventById(Long id) {
         return repository.findById(id)
