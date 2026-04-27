@@ -10,7 +10,6 @@ import com.arenape.webapi.repository.EventRepository;
 
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -51,10 +50,6 @@ public class EventService {
 
         if (event.getStatus() == EventStatus.CANCELLED) {
             throw new BusinessException("Não é possível editar um evento cancelado");
-        }
-
-        if (request.eventDate().isBefore(LocalDateTime.now())) {
-            throw new BusinessException("A data do evento deve ser no futuro");
         }
 
         if (request.status() != null) {
