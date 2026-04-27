@@ -40,12 +40,34 @@ export interface EventResponseDTO {
   availableTickets: number;
   price: number;
   imageUrl?: string | null;
-  category?: string | null; // se um dia o back passar a mandar
+  category?: string | null;
   status?: string | null;
 }
+
+/** Ingresso comprado pelo usuário */
+export interface IngressoComprado {
+  id: string;
+  eventoId: number;
+  eventoNome: string;
+  eventoData: string;
+  eventoCategoria: CategoryKey;
+  quantidade: number;
+  preco: number;
+  total: number;
+  dataCompra: string;
+  codigoConfirmacao: string;
+  imagemUrl: string | null;
+}
+
+/** Visibilidade da enquete — controlada pelo admin */
+export type PollVisibility = "visible" | "hidden";
 
 export const FALLBACK_EVENTOS: Evento[] = [
   { id: 1, nome: "Show do João Gomes", data: "2026-06-24", categoria: "SHOW", descricao: "Gravação do novo DVD do João Gomes na Arena Pernambuco.", ingressosDisponiveis: 32500, preco: 120, imagemUrl: null },
   { id: 2, nome: "Sport x Náutico — Final Pernambucano", data: "2026-04-15", categoria: "ESPORTE", descricao: "Grande final do Campeonato Pernambucano na Arena.", ingressosDisponiveis: 0, preco: 80, imagemUrl: null },
   { id: 3, nome: "Exposição de Arte Armorial", data: "2026-07-05", categoria: "CULTURAL", descricao: "Exposição em homenagem a Ariano Suassuna.", ingressosDisponiveis: 4880, preco: 0, imagemUrl: null },
 ];
+
+export function gerarCodigoConfirmacao(): string {
+  return "AP-" + Math.random().toString(36).substring(2, 8).toUpperCase();
+}

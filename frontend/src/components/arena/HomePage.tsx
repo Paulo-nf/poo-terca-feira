@@ -1,4 +1,4 @@
-import type { Evento } from "@/lib/constants";
+import type { Evento, PollVisibility } from "@/lib/constants";
 import { Hero } from "@/components/arena/Hero";
 import { EventCard } from "@/components/arena/EventCard";
 import { SkeletonCard } from "@/components/arena/SkeletonCard";
@@ -11,9 +11,15 @@ interface HomePageProps {
   onComprar: (evento: Evento) => void;
   onSelectEvento?: (evento: Evento) => void;
   setPage: (page: string) => void;
+  pollVisibility?: PollVisibility;
+  onTogglePoll?: () => void;
+  isAdmin?: boolean;
 }
 
-export function HomePage({ eventos, loading, onComprar, onSelectEvento, setPage }: HomePageProps) {
+export function HomePage({
+  eventos, loading, onComprar, onSelectEvento, setPage,
+  pollVisibility = "visible", onTogglePoll, isAdmin = false,
+}: HomePageProps) {
   return (
     <>
       <Hero setPage={setPage} />
@@ -44,7 +50,10 @@ export function HomePage({ eventos, loading, onComprar, onSelectEvento, setPage 
             </div>
             {eventos.length > 3 && (
               <div className="text-center mt-8">
-                <button onClick={() => setPage("eventos")} className="inline-flex items-center gap-2 bg-blue text-primary-foreground px-[26px] py-[13px] rounded-xl font-extrabold text-sm transition-all duration-200 shadow-[0_4px_14px_hsla(220,82%,34%,0.22)] hover:bg-blue-dark hover:-translate-y-0.5">
+                <button
+                  onClick={() => setPage("eventos")}
+                  className="inline-flex items-center gap-2 bg-blue text-primary-foreground px-[26px] py-[13px] rounded-xl font-extrabold text-sm transition-all duration-200 shadow-[0_4px_14px_hsla(220,82%,34%,0.22)] hover:bg-blue-dark hover:-translate-y-0.5"
+                >
                   Ver todos os eventos →
                 </button>
               </div>
@@ -54,7 +63,14 @@ export function HomePage({ eventos, loading, onComprar, onSelectEvento, setPage 
       </section>
 
       <HowItWorks />
-      <NextEventSection eventos={eventos} loading={loading} onComprar={onComprar} />
+      <NextEventSection
+        eventos={eventos}
+        loading={loading}
+        onComprar={onComprar}
+        pollVisibility={pollVisibility}
+        onTogglePoll={onTogglePoll}
+        isAdmin={isAdmin}
+      />
     </>
   );
 }
