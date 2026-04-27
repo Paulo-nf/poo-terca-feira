@@ -1,4 +1,4 @@
-export const API_BASE = "http://localhost:8080";
+export const API_BASE = "";
 export const API_EVENTS = `${API_BASE}/events`;
 export const API_LOGIN = `${API_BASE}/auth/login`;
 export const API_REGISTER = `${API_BASE}/auth/register`;

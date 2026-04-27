@@ -14,7 +14,14 @@ export interface AuthResponse {
   user: AuthUser;
 }
 
-async function parseOrThrow(res: Response) {
+/** Shape real que o backend Spring retorna */
+interface BackendAuthResponse {
+  token: string;
+  name: string;
+  role: string;
+}
+
+async function parseOrThrow(res: Response): Promise<BackendAuthResponse> {
   const text = await res.text();
   let data: any = null;
   try { data = text ? JSON.parse(text) : null; } catch { /* ignore */ }
@@ -25,13 +32,27 @@ async function parseOrThrow(res: Response) {
   return data;
 }
 
+/** Converte a resposta flat do backend para o formato AuthResponse usado na UI */
+function toAuthResponse(email: string, raw: BackendAuthResponse): AuthResponse {
+  return {
+    token: raw.token,
+    user: {
+      id: 0, // backend não devolve id no login/register
+      name: raw.name,
+      email,
+      role: (raw.role as Role) ?? "USER",
+    },
+  };
+}
+
 export async function login(email: string, password: string): Promise<AuthResponse> {
   const res = await fetch(API_LOGIN, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ email, password }),
   });
-  return parseOrThrow(res);
+  const raw = await parseOrThrow(res);
+  return toAuthResponse(email, raw);
 }
 
 export async function register(name: string, email: string, password: string): Promise<AuthResponse> {
@@ -40,5 +61,6 @@ export async function register(name: string, email: string, password: string): P
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ name, email, password }),
   });
-  return parseOrThrow(res);
+  const raw = await parseOrThrow(res);
+  return toAuthResponse(email, raw);
 }
