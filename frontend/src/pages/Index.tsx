@@ -12,6 +12,7 @@ import { LoginModal } from "@/components/arena/LoginModal";
 import { RegisterPage } from "@/components/arena/RegisterPage";
 import { AdminEventsPage } from "@/components/arena/AdminEventsPage";
 import { AdminEventForm } from "@/components/arena/AdminEventForm";
+import { EventDetailPage } from "@/components/arena/EventDetailPage";
 
 function Shell() {
   const [page, setPage] = useState("home");
@@ -20,6 +21,7 @@ function Shell() {
   const [toast, setToast] = useState<string | null>(null);
   const [loginOpen, setLoginOpen] = useState(false);
   const [editandoEvento, setEditandoEvento] = useState<Evento | null>(null);
+  const [eventoSelecionado, setEventoSelecionado] = useState<Evento | null>(null);
   const { isAuthenticated, isAdmin } = useAuth();
 
   useEffect(() => {
@@ -48,6 +50,12 @@ function Shell() {
       return;
     }
     showToast(`🎟️ Redirecionando para compra: ${evento.nome}`);
+  };
+
+  const handleSelectEvento = (evento: Evento) => {
+    setEventoSelecionado(evento);
+    setPage("evento");
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const handleSalvarEvento = (evento: Evento) => {
@@ -79,10 +87,24 @@ function Shell() {
       {!page.startsWith("admin") && <Ticker eventos={eventos} />}
 
       {page === "home" && (
-        <HomePage eventos={eventos} loading={loading} onComprar={handleComprar} setPage={setPage} />
+        <HomePage eventos={eventos} loading={loading} onComprar={handleComprar} onSelectEvento={handleSelectEvento} setPage={setPage} />
       )}
       {page === "eventos" && (
-        <EventsPage eventos={eventos} loading={loading} onComprar={handleComprar} />
+        <EventsPage eventos={eventos} loading={loading} onComprar={handleComprar} onSelectEvento={handleSelectEvento} />
+      )}
+      {page === "evento" && eventoSelecionado && (
+        <EventDetailPage
+          evento={eventoSelecionado}
+          onVoltar={() => setPage("eventos")}
+          onComprar={(ev, qtd) => {
+            if (!isAuthenticated) {
+              setLoginOpen(true);
+              showToast("Faça login para comprar ingressos.");
+              return;
+            }
+            showToast(`🎟️ ${qtd} ingresso(s) para ${ev.nome} reservado(s)!`);
+          }}
+        />
       )}
       {page === "registro" && (
         <RegisterPage

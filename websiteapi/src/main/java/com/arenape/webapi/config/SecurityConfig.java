@@ -50,6 +50,7 @@ public class SecurityConfig {
         config.setAllowCredentials(true);
         config.setAllowedOrigins(List.of(
             "http://localhost:3000",
+            "http://localhost:3030",
             "http://localhost:5173",
             "http://localhost:8081"
         ));

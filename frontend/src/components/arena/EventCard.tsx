@@ -4,16 +4,26 @@ import { formatDate, formatPrice, getTicketStatus } from "@/lib/event-utils";
 interface EventCardProps {
   evento: Evento;
   onComprar: (evento: Evento) => void;
+  onSelect?: (evento: Evento) => void;
   animationDelay?: number;
 }
 
-export function EventCard({ evento, onComprar, animationDelay = 0 }: EventCardProps) {
+export function EventCard({ evento, onComprar, onSelect, animationDelay = 0 }: EventCardProps) {
   const cat = CATEGORIES[evento.categoria] || CATEGORIES.CULTURAL;
   const { day, month } = formatDate(evento.data);
   const status = getTicketStatus(evento.ingressosDisponiveis);
 
   return (
     <div
+      onClick={() => onSelect?.(evento)}
+      role={onSelect ? "button" : undefined}
+      tabIndex={onSelect ? 0 : undefined}
+      onKeyDown={(e) => {
+        if (onSelect && (e.key === "Enter" || e.key === " ")) {
+          e.preventDefault();
+          onSelect(evento);
+        }
+      }}
       className="bg-card border border-border rounded-lg overflow-hidden cursor-pointer transition-all duration-200 shadow-sm hover:-translate-y-1 hover:shadow-lg hover:border-blue/20"
       style={{ animation: `fade-up 0.5s ${animationDelay}s ease both` }}
     >
@@ -59,7 +69,7 @@ export function EventCard({ evento, onComprar, animationDelay = 0 }: EventCardPr
           </div>
           <button
             disabled={status.esgotado}
-            onClick={() => onComprar(evento)}
+            onClick={(e) => { e.stopPropagation(); onComprar(evento); }}
             className="px-[18px] py-2 rounded-[10px] text-[13px] font-extrabold bg-blue text-primary-foreground transition-all duration-200 tracking-wide hover:bg-blue-dark hover:scale-[1.04] disabled:bg-surface2 disabled:text-muted-foreground disabled:cursor-not-allowed disabled:transform-none"
           >
             {status.esgotado ? "Esgotado" : "Comprar"}

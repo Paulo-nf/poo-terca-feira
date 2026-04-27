@@ -9,10 +9,11 @@ interface HomePageProps {
   eventos: Evento[];
   loading: boolean;
   onComprar: (evento: Evento) => void;
+  onSelectEvento?: (evento: Evento) => void;
   setPage: (page: string) => void;
 }
 
-export function HomePage({ eventos, loading, onComprar, setPage }: HomePageProps) {
+export function HomePage({ eventos, loading, onComprar, onSelectEvento, setPage }: HomePageProps) {
   return (
     <>
       <Hero setPage={setPage} />
@@ -38,7 +39,7 @@ export function HomePage({ eventos, loading, onComprar, setPage }: HomePageProps
           <>
             <div className="grid grid-cols-[repeat(auto-fill,minmax(290px,1fr))] gap-[22px]">
               {eventos.slice(0, 3).map((e, i) => (
-                <EventCard key={e.id} evento={e} onComprar={onComprar} animationDelay={i * 0.08} />
+                <EventCard key={e.id} evento={e} onComprar={onComprar} onSelect={onSelectEvento} animationDelay={i * 0.08} />
               ))}
             </div>
             {eventos.length > 3 && (
