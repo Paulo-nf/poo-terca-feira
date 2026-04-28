@@ -207,6 +207,6 @@ Clique na imagem abaixo abaixo para visualizar.
 # Entrega 3
 ## 📺  Screencast
 👉 **[Demo](https://youtu.be/NRYEwl3QbmU)**
-
+![Bug Tracker Interface](https://i.ibb.co/vx4HFTZy/Screenshot-20260427-231423.png)
 
 
