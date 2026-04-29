@@ -25,27 +25,38 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
-                                    HttpServletResponse response,
-                                    FilterChain filterChain) throws ServletException, IOException {
+            HttpServletResponse response,
+            FilterChain filterChain) throws ServletException, IOException {
 
+        // 1. THIS IS THE MISSING LINE! It grabs the header from the request.
         String authHeader = request.getHeader("Authorization");
 
+        // 2. Safety check: If there is no token, just pass the request along.
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
             return;
         }
 
+        // 3. Extract the token and email
         String token = authHeader.substring(7);
         String email = jwtService.extractUsername(token);
+
+        System.out.println("DEBUG: Token recebido para o email -> " + email);
 
         if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UserDetails user = userRepository.findByEmail(email).orElse(null);
 
+            System.out.println("DEBUG: Usuário encontrado no banco? -> " + (user != null));
+
             if (user != null && jwtService.isTokenValid(token, user)) {
-                UsernamePasswordAuthenticationToken auth =
-                        new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
+                System.out.println("DEBUG: Autoridades (Roles) do usuário -> " + user.getAuthorities());
+
+                UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(user, null,
+                        user.getAuthorities());
                 auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(auth);
+            } else {
+                System.out.println("DEBUG: Falha - Usuário é nulo ou token inválido.");
             }
         }
 
