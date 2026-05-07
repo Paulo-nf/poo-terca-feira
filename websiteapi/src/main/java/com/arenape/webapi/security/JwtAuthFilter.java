@@ -40,22 +40,14 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         String token = authHeader.substring(7);
         String email = jwtService.extractUsername(token);
 
-        System.out.println("DEBUG: Token recebido para o email -> " + email);
-
         if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UserDetails user = userRepository.findByEmail(email).orElse(null);
 
-            System.out.println("DEBUG: Usuário encontrado no banco? -> " + (user != null));
-
             if (user != null && jwtService.isTokenValid(token, user)) {
-                System.out.println("DEBUG: Autoridades (Roles) do usuário -> " + user.getAuthorities());
-
                 UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(user, null,
                         user.getAuthorities());
                 auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(auth);
-            } else {
-                System.out.println("DEBUG: Falha - Usuário é nulo ou token inválido.");
             }
         }
 
