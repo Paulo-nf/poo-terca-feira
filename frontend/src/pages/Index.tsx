@@ -139,12 +139,41 @@ function Shell() {
         }
     };
 
-    const handleExcluir = (evento: Evento) => {
-        if (!confirm(`Excluir "${evento.nome}"?`)) return;
-        setEventos((prev) => prev.filter((e) => e.id !== evento.id));
-        // Remove da enquete se estiver lá
-        setEnqueteIds((prev) => prev.filter((id) => id !== evento.id));
-        showToast("Evento excluído.");
+    const handleExcluir = async (evento: Evento) => {
+        // 1. Confirmação do usuário
+        if (!confirm(`Tem certeza que deseja excluir o evento "${evento.nome}"?`)) return;
+
+        // 2. Verifica se o token existe (garante que é o admin logado)
+        if (!token) {
+            showToast("Erro: Você não está autenticado.");
+            return;
+        }
+
+        try {
+            // 3. Envia a requisição DELETE para o Spring Boot
+            const response = await fetch(`${API_EVENTS}/${evento.id}`, {
+                method: "DELETE",
+                headers: {
+                    "Authorization": `Bearer ${token}`
+                }
+            });
+
+            // 4. Verifica se o backend aceitou a exclusão
+            if (!response.ok) {
+                if (response.status === 403) throw new Error("Acesso negado. Token inválido/expirado.");
+                throw new Error(`Erro no servidor: ${response.status}`);
+            }
+
+            // 5. Se o backend deletou com sucesso, removemos da tela (React state)
+            setEventos((prev) => prev.filter((e) => e.id !== evento.id));
+            setEnqueteIds((prev) => prev.filter((id) => id !== evento.id));
+
+            showToast("Evento excluído do banco de dados com sucesso!");
+
+        } catch (error) {
+            console.error("Erro ao excluir:", error);
+            showToast(`Erro ao excluir: ${error instanceof Error ? error.message : 'Falha desconhecida'}`);
+        }
     };
 
     return (
