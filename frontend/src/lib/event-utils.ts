@@ -40,6 +40,6 @@ export function mapEvento(dto: any): Evento {
         preco: dto.price,
         ingressosDisponiveis: dto.availableTickets,
         data: dto.eventDate,
-        categoria: "SHOW", // ou a categoria apropriada
+        categoria: inferCategoria(dto),
     };
 }

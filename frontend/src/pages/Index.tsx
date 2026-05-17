@@ -127,10 +127,11 @@ function Shell() {
             // Se o backend retornar direto o objeto, ele usa o responseBody.
             const eventoSalvo = responseBody.dados ? responseBody.dados : responseBody;
 
-            // Atualiza a tela usando a função mapEvento
+            // Atualiza a tela usando a função mapEvento, preservando a categoria escolhida no form
+            const eventoMapeado = { ...mapEvento(eventoSalvo), categoria: evento.categoria };
             setEventos((prev) => {
-                if (isCriando) return [...prev, mapEvento(eventoSalvo)];
-                return prev.map((e) => (e.id === eventoSalvo.id ? mapEvento(eventoSalvo) : e));
+                if (isCriando) return [...prev, eventoMapeado];
+                return prev.map((e) => (e.id === eventoSalvo.id ? eventoMapeado : e));
             });
 
             showToast(isCriando ? "Evento criado no banco de dados!" : "Alterações salvas no banco!");
