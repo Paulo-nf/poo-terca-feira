@@ -53,12 +53,15 @@ public class EventService {
             throw new BusinessException("Não é possível editar um evento cancelado");
         }
 
+        int sold = Math.max(0, event.getTotalTickets() - event.getAvailableTickets());
+
         event.setName(request.name());
         event.setLocation(request.location());
         event.setDescription(request.description());
         event.setImageUrl(request.imageUrl());
         event.setPrice(request.price());
         event.setAvailableTickets(request.availableTickets());
+        event.setTotalTickets(request.availableTickets() + sold);
         event.setEventDate(request.eventDate());
 
         return toDTO(repository.save(event));

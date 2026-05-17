@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { fetchMyTickets, type TicketDTO } from "@/lib/tickets-api";
 import { formatDate, formatPrice, formatTime } from "@/lib/event-utils";
@@ -145,7 +145,7 @@ function TicketCard({
               : "bg-muted text-muted-foreground"
           }`}
         >
-          {future ? "Confirmado" : "Realizado"}
+          {future ? "Confirmado" : "Passado"}
         </span>
       </div>
 
@@ -194,7 +194,8 @@ function TicketCard({
               formatDate(ticket.purchaseDate).month + " " +
               formatDate(ticket.purchaseDate).year}
           />
-          <DetailRow label="Status" value={ticket.status} />
+          <DetailRow label="Status" value={future ? "Confirmado" : "Passado"} />
+          <QRCodePlaceholder ticketId={ticket.id} eventName={ticket.eventName} />
         </div>
       )}
 
@@ -206,6 +207,90 @@ function TicketCard({
           Ver evento
         </button>
       )}
+    </div>
+  );
+}
+
+function seededRandom(seed: number) {
+  let s = seed;
+  return () => {
+    s = (s * 1664525 + 1013904223) & 0x7fffffff;
+    return s / 0x7fffffff;
+  };
+}
+
+function QRCodePlaceholder({ ticketId, eventName }: { ticketId: number; eventName: string }) {
+  const svgRef = useRef<SVGSVGElement>(null);
+  const SIZE = 21;
+  const CELL = 7;
+  const PAD = 6;
+  const dim = SIZE * CELL + PAD * 2;
+
+  function finderCell(dr: number, dc: number): boolean | null {
+    if (dr < 0 || dr >= 7 || dc < 0 || dc >= 7) return null;
+    if (dr === 0 || dr === 6 || dc === 0 || dc === 6) return true;
+    if (dr === 1 || dr === 5 || dc === 1 || dc === 5) return false;
+    return true;
+  }
+
+  const rand = seededRandom(ticketId);
+  const cells = Array.from({ length: SIZE * SIZE }, (_, i) => {
+    const r = Math.floor(i / SIZE);
+    const c = i % SIZE;
+    const x = PAD + c * CELL;
+    const y = PAD + r * CELL;
+
+    const tl = finderCell(r, c);
+    if (tl !== null) return tl ? <rect key={i} x={x} y={y} width={CELL} height={CELL} fill="#1a2a4a" /> : null;
+    const tr = finderCell(r, c - (SIZE - 7));
+    if (tr !== null) return tr ? <rect key={i} x={x} y={y} width={CELL} height={CELL} fill="#1a2a4a" /> : null;
+    const bl = finderCell(r - (SIZE - 7), c);
+    if (bl !== null) return bl ? <rect key={i} x={x} y={y} width={CELL} height={CELL} fill="#1a2a4a" /> : null;
+
+    if ((r <= 7 && c <= 7) || (r <= 7 && c >= SIZE - 8) || (r >= SIZE - 8 && c <= 7)) return null;
+
+    if (r === 6 && c >= 8 && c <= SIZE - 9) return c % 2 === 0 ? <rect key={i} x={x} y={y} width={CELL} height={CELL} fill="#1a2a4a" /> : null;
+    if (c === 6 && r >= 8 && r <= SIZE - 9) return r % 2 === 0 ? <rect key={i} x={x} y={y} width={CELL} height={CELL} fill="#1a2a4a" /> : null;
+
+    return rand() > 0.45 ? <rect key={i} x={x} y={y} width={CELL} height={CELL} fill="#1a2a4a" /> : null;
+  });
+
+  function handleDownload() {
+    const svg = svgRef.current;
+    if (!svg) return;
+    const svgStr = new XMLSerializer().serializeToString(svg);
+    const blob = new Blob([svgStr], { type: "image/svg+xml" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `ingresso-${eventName.replace(/\s+/g, "-").toLowerCase()}-${ticketId}.svg`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  return (
+    <div className="flex flex-col items-center gap-2.5 pt-3 border-t border-border mt-1.5">
+      <p className="text-[11px] font-bold uppercase tracking-wide text-muted-foreground self-start">
+        QR Code
+      </p>
+      <div className="bg-white rounded-[8px] p-1.5 border border-border shadow-sm">
+        <svg
+          ref={svgRef}
+          width={dim}
+          height={dim}
+          viewBox={`0 0 ${dim} ${dim}`}
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <rect width={dim} height={dim} fill="white" />
+          {cells}
+        </svg>
+      </div>
+      <button
+        onClick={handleDownload}
+        className="text-[11.5px] font-bold text-blue hover:text-blue-dark transition-colors flex items-center gap-1.5 self-start"
+      >
+        ⬇ Baixar QR Code
+      </button>
     </div>
   );
 }

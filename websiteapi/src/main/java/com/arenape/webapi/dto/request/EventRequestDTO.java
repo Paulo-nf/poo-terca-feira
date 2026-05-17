@@ -33,7 +33,7 @@ public record EventRequestDTO(
     BigDecimal price,
 
     @NotNull(message = "A quantidade de ingressos é obrigatória")
-    @Min(value = 1, message = "Deve haver pelo menos 1 ingresso disponível")
+    @Min(value = 0, message = "A quantidade de ingressos não pode ser negativa")
     Integer availableTickets,
 
     @NotNull(message = "A data do evento é obrigatória")

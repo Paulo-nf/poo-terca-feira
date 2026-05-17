@@ -24,6 +24,9 @@ export function HomePage({
   enqueteVisivel,
   enqueteIds,
 }: HomePageProps) {
+  const today = new Date().toISOString().slice(0, 10);
+  const eventosVisiveis = eventos.filter((e) => e.data.slice(0, 10) >= today);
+
   return (
     <>
       <Hero setPage={setPage} />
@@ -39,7 +42,7 @@ export function HomePage({
           <div className="grid grid-cols-[repeat(auto-fill,minmax(290px,1fr))] gap-[22px]">
             {[1, 2, 3].map((i) => <SkeletonCard key={i} />)}
           </div>
-        ) : eventos.length === 0 ? (
+        ) : eventosVisiveis.length === 0 ? (
           <div className="text-center py-20 text-muted-foreground">
             <div className="text-5xl mb-4">🎟️</div>
             <h3 className="font-heading text-xl font-extrabold text-blue-dark mb-2">Nenhum evento disponível</h3>
@@ -48,11 +51,11 @@ export function HomePage({
         ) : (
           <>
             <div className="grid grid-cols-[repeat(auto-fill,minmax(290px,1fr))] gap-[22px]">
-              {eventos.slice(0, 3).map((e, i) => (
+              {eventosVisiveis.slice(0, 3).map((e, i) => (
                 <EventCard key={e.id} evento={e} onSelect={onSelectEvento} animationDelay={i * 0.08} />
               ))}
             </div>
-            {eventos.length > 3 && (
+            {eventosVisiveis.length > 3 && (
               <div className="text-center mt-8">
                 <button onClick={() => setPage("eventos")} className="inline-flex items-center gap-2 bg-blue text-primary-foreground px-[26px] py-[13px] rounded-xl font-extrabold text-sm transition-all duration-200 shadow-[0_4px_14px_hsla(220,82%,34%,0.22)] hover:bg-blue-dark hover:-translate-y-0.5">
                   Ver todos os eventos →

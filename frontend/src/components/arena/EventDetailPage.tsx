@@ -12,6 +12,7 @@ export function EventDetailPage({ evento, onVoltar, onComprar }: EventDetailPage
   const cat = CATEGORIES[evento.categoria] || CATEGORIES.CULTURAL;
   const { day, month, year } = formatDate(evento.data);
   const status = getTicketStatus(evento.ingressosDisponiveis);
+  const isPast = evento.data.slice(0, 10) < new Date().toISOString().slice(0, 10);
   const [quantidade, setQuantidade] = useState(0);
 
   const max = Math.min(evento.ingressosDisponiveis, 10);
@@ -77,36 +78,6 @@ export function EventDetailPage({ evento, onVoltar, onComprar }: EventDetailPage
               {evento.descricao || "Sem descrição disponível para este evento."}
             </div>
 
-            <h2 className="font-heading text-[22px] font-extrabold text-blue-dark mb-5">
-              Política de evento
-            </h2>
-
-            <div className="mb-6">
-              <h3 className="font-heading text-[15px] font-extrabold text-blue-dark mb-2">
-                Cancelamento de pedidos pagos
-              </h3>
-              <p className="text-[13.5px] text-muted-foreground leading-relaxed mb-2">
-                O cancelamento pode ser solicitado em até 7 dias após a compra,
-                desde que faltem mais de 48 horas para o início do evento, conforme
-                o Código de Defesa do Consumidor.
-              </p>
-              <a className="text-[12.5px] font-bold text-blue hover:text-blue-dark cursor-pointer">
-                Cancelamento de pedidos pagos
-              </a>
-            </div>
-
-            <div>
-              <h3 className="font-heading text-[15px] font-extrabold text-blue-dark mb-2">
-                Edição de participantes
-              </h3>
-              <p className="text-[13.5px] text-muted-foreground leading-relaxed mb-2">
-                Você pode alterar os dados do participante até 24 horas antes do
-                evento, diretamente na sua área de ingressos.
-              </p>
-              <a className="text-[12.5px] font-bold text-blue hover:text-blue-dark cursor-pointer">
-                Saiba como editar participantes
-              </a>
-            </div>
           </div>
 
           {/* Coluna direita: seleção de ingresso */}
@@ -140,7 +111,7 @@ export function EventDetailPage({ evento, onVoltar, onComprar }: EventDetailPage
                 <div className="flex items-center gap-2 shrink-0">
                   <button
                     onClick={dec}
-                    disabled={quantidade === 0 || status.esgotado}
+                    disabled={quantidade === 0 || status.esgotado || isPast}
                     aria-label="Diminuir quantidade"
                     className="w-8 h-8 rounded-[8px] border-[1.5px] border-border bg-card text-blue-dark font-extrabold text-base flex items-center justify-center hover:border-blue hover:text-blue transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
                   >
@@ -151,7 +122,7 @@ export function EventDetailPage({ evento, onVoltar, onComprar }: EventDetailPage
                   </span>
                   <button
                     onClick={inc}
-                    disabled={quantidade >= max || status.esgotado}
+                    disabled={quantidade >= max || status.esgotado || isPast}
                     aria-label="Aumentar quantidade"
                     className="w-8 h-8 rounded-[8px] border-[1.5px] border-blue bg-blue text-primary-foreground font-extrabold text-base flex items-center justify-center hover:bg-blue-dark transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
                   >
@@ -169,11 +140,11 @@ export function EventDetailPage({ evento, onVoltar, onComprar }: EventDetailPage
             </div>
 
             <button
-              disabled={quantidade === 0 || status.esgotado}
+              disabled={quantidade === 0 || status.esgotado || isPast}
               onClick={() => onComprar(evento, quantidade)}
               className="w-full py-3 rounded-[12px] text-[14px] font-extrabold bg-blue text-primary-foreground tracking-wide hover:bg-blue-dark hover:scale-[1.01] transition-all duration-200 disabled:bg-muted disabled:text-muted-foreground disabled:cursor-not-allowed disabled:hover:scale-100"
             >
-              {status.esgotado ? "Esgotado" : "Comprar ingressos"}
+              {isPast ? "Evento encerrado" : status.esgotado ? "Esgotado" : "Comprar ingressos"}
             </button>
           </aside>
         </div>

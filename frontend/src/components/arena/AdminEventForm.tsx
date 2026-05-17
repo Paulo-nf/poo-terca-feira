@@ -46,7 +46,7 @@ export function AdminEventForm({
     if (evento?.data?.includes("T")) return evento.data.slice(11, 16);
     return "20:00";
   });
-  const [capacidade, setCapacidade] = useState<number>(base.ingressosDisponiveis || 1000);
+  const [capacidade, setCapacidade] = useState<number>(base.totalIngressos || base.ingressosDisponiveis || 1000);
   const [status] = useState<StatusKey>(() => {
     if (base.status === "CANCELLED") return "CANCELADO";
     if (base.ingressosDisponiveis <= 0) return "ESGOTADO";
@@ -58,11 +58,13 @@ export function AdminEventForm({
   const handleSalvar = () => {
     const isCriando = mode === "criar";
     const dateOnly = form.data.includes("T") ? form.data.slice(0, 10) : form.data;
+    const soldTickets = isCriando ? 0 : Math.max(0, base.totalIngressos - base.ingressosDisponiveis);
+    const newAvailable = Math.max(0, capacidade - soldTickets);
     onSalvar({
       ...form,
       data: `${dateOnly}T${hora}`,
-      ingressosDisponiveis: capacidade,
-      totalIngressos: isCriando ? capacidade : (form.totalIngressos || capacidade),
+      ingressosDisponiveis: newAvailable,
+      totalIngressos: capacidade,
     });
   };
 
