@@ -41,7 +41,7 @@ export function AdminEventForm({
   const [form, setForm] = useState<Evento>(base);
   const [hora, setHora] = useState(evento ? "20:00" : "20:00");
   const [capacidade, setCapacidade] = useState<number>(base.ingressosDisponiveis || 1000);
-  const [status] = useState<StatusKey>("ATIVO");
+  const [status] = useState<StatusKey>(base.ingressosDisponiveis <= 0 ? "CANCELADO" : "ATIVO");
 
   const update = <K extends keyof Evento>(k: K, v: Evento[K]) => setForm((f) => ({ ...f, [k]: v }));
 
