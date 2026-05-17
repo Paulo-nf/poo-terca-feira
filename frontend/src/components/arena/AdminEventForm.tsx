@@ -11,12 +11,11 @@ interface AdminEventFormProps {
   onDuplicar?: (evento: Evento) => void;
 }
 
-type StatusKey = "ATIVO" | "PLANEJAMENTO" | "CANCELADO";
+type StatusKey = "ATIVO" | "CANCELADO";
 
 const STATUS_META: Record<StatusKey, { label: string; dot: string; text: string }> = {
-  ATIVO:        { label: "Ativo",           dot: "bg-emerald-500", text: "text-emerald-600" },
-  PLANEJAMENTO: { label: "Em Planejamento", dot: "bg-amber-500",   text: "text-amber-600" },
-  CANCELADO:    { label: "Cancelado",       dot: "bg-rose-500",    text: "text-rose-600" },
+  ATIVO:     { label: "Ativo",     dot: "bg-emerald-500", text: "text-emerald-600" },
+  CANCELADO: { label: "Cancelado", dot: "bg-rose-500",    text: "text-rose-600" },
 };
 
 const DEFAULT_EVENTO: Evento = {
@@ -244,7 +243,7 @@ export function AdminEventForm({
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
-                  💰 {formatPrice(form.preco)}
+                  💰 {form.preco.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
                 </div>
               </div>
               <button className="mt-4 w-full py-2 rounded-[10px] bg-surface2 text-blue-dark text-[13px] font-extrabold hover:bg-blue-light transition-colors flex items-center justify-center gap-2">

@@ -14,18 +14,15 @@ interface AdminEventsPageProps {
   onSalvarEnquete: (ids: number[]) => void;
 }
 
-type StatusKey = "ATIVO" | "PLANEJAMENTO" | "CANCELADO";
+type StatusKey = "ATIVO" | "CANCELADO";
 
 const STATUS_META: Record<StatusKey, { label: string; dot: string; text: string }> = {
-  ATIVO:         { label: "Ativo",          dot: "bg-emerald-500", text: "text-emerald-600" },
-  PLANEJAMENTO:  { label: "Em Planejamento",dot: "bg-amber-500",   text: "text-amber-600" },
-  CANCELADO:     { label: "Cancelado",      dot: "bg-rose-500",    text: "text-rose-600" },
+  ATIVO:     { label: "Ativo",     dot: "bg-emerald-500", text: "text-emerald-600" },
+  CANCELADO: { label: "Cancelado", dot: "bg-rose-500",    text: "text-rose-600" },
 };
 
 function inferStatus(e: Evento): StatusKey {
   if (e.ingressosDisponiveis <= 0) return "CANCELADO";
-  const today = new Date().toISOString().slice(0, 10);
-  if (e.data > today) return "PLANEJAMENTO";
   return "ATIVO";
 }
 
@@ -57,9 +54,11 @@ export function AdminEventsPage({
     const today = new Date().toISOString().slice(0, 10);
     return eventos
       .map((e) => {
+        const status = inferStatus(e);
+        if (status === "CANCELADO") return { e, status, total: 0, vendidos: 0 };
         const total = capacidadeTotal(e);
         const vendidos = Math.max(total - e.ingressosDisponiveis, 0);
-        return { e, status: inferStatus(e), total, vendidos };
+        return { e, status, total, vendidos };
       })
       .filter(({ e }) => {
         if (filtroPeriodo === "PROXIMOS" && e.data < today) return false;
@@ -75,6 +74,7 @@ export function AdminEventsPage({
     let vendidos = 0;
     let receita = 0;
     eventos.forEach((e) => {
+      if (inferStatus(e) === "CANCELADO") return;
       const total = capacidadeTotal(e);
       const v = Math.max(total - e.ingressosDisponiveis, 0);
       vendidos += v;
@@ -102,7 +102,7 @@ export function AdminEventsPage({
       <section className="grid grid-cols-3 gap-4 mb-8 max-md:grid-cols-1">
         <KpiCard icon="📅" label="Eventos Ativos" value={totais.ativos.toString()} />
         <KpiCard icon="🎟️" label="Ingressos Vendidos" value={totais.vendidos.toLocaleString("pt-BR")} />
-        <KpiCard icon="💰" label="Receita Total" value={formatPrice(totais.receita)} />
+        <KpiCard icon="💰" label="Receita Total" value={totais.receita.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })} />
       </section>
 
       {/* ─── PAINEL DE CONTROLE DA ENQUETE ─── */}
@@ -245,7 +245,6 @@ export function AdminEventsPage({
               options={[
                 { value: "TODOS", label: "Todos os status" },
                 { value: "ATIVO", label: "Ativo" },
-                { value: "PLANEJAMENTO", label: "Em Planejamento" },
                 { value: "CANCELADO", label: "Cancelado" },
               ]}
             />
