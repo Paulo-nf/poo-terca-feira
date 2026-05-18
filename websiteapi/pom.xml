@@ -65,15 +65,6 @@
 			<artifactId>h2</artifactId>
 		</dependency>
 
-		<!-- PostgreSQL (descomente quando for para produção) -->
-		<!--
-		<dependency>
-			<groupId>org.postgresql</groupId>
-			<artifactId>postgresql</artifactId>
-			<scope>runtime</scope>
-		</dependency>
-		-->
-
 		<!-- Teste -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
