@@ -29,7 +29,7 @@ public class EventService {
         event.setImageUrl(request.imageUrl());
         event.setPrice(request.price());
         event.setAvailableTickets(request.availableTickets());
-        event.setTotalTickets(request.availableTickets());
+        event.setTotalTickets(request.totalTickets() != null ? request.totalTickets() : request.availableTickets());
         event.setEventDate(request.eventDate());
         event.setStatus(EventStatus.PENDING); // criação sempre inicia como PENDING
 

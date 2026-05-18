@@ -36,6 +36,9 @@ public record EventRequestDTO(
     @Min(value = 0, message = "A quantidade de ingressos não pode ser negativa")
     Integer availableTickets,
 
+    @Min(value = 0, message = "O total de ingressos não pode ser negativo")
+    Integer totalTickets,
+
     @NotNull(message = "A data do evento é obrigatória")
     @Future(message = "A data do evento deve ser no futuro")
     @Schema(example = "2026-12-31T19:00")

@@ -44,38 +44,35 @@ O projeto busca **resolver esse problema por meio de uma solução tecnológica*
 ## Pré-requisitos
 
 - Java 17+
-- PostgreSQL rodando localmente (ou via Docker)
-
-## Configuração do banco
-
-Crie o banco antes de subir a aplicação:
-
-```sql
-CREATE DATABASE arenape;
-```
 
 ## Variáveis de ambiente
 
-| Variável            | Descrição                              | Padrão (dev)                                      |
-|---------------------|----------------------------------------|---------------------------------------------------|
-| `DB_URL`            | URL JDBC do PostgreSQL                 | `jdbc:postgresql://localhost:5432/arenape`        |
-| `DB_USERNAME`       | Usuário do banco                       | `postgres`                                        |
-| `DB_PASSWORD`       | Senha do banco                         | `postgres`                                        |
+| Variável            | Descrição                              | Padrão (dev)                                       |
+|---------------------|----------------------------------------|----------------------------------------------------|
 | `JWT_SECRET`        | Secret para assinar os tokens (≥32 chars) | `minha-chave-secreta-super-segura-minimo-256bits!!` |
-| `JWT_EXPIRATION_MS` | Validade do token em ms                | `86400000` (24h)                                  |
-| `ADMIN_EMAIL`       | E-mail do admin criado no seed         | `admin@arenape.com`                               |
-| `ADMIN_PASSWORD`    | Senha do admin criado no seed          | `admin123`                                        |
-| `CORS_ORIGINS`      | Origens permitidas (separadas por vírgula) | `http://localhost:3000`                        |
+| `JWT_EXPIRATION_MS` | Validade do token em ms                | `86400000` (24h)                                   |
+| `ADMIN_EMAIL`       | E-mail do admin criado no seed         | `admin@arenape.com`                                |
+| `ADMIN_PASSWORD`    | Senha do admin criado no seed          | `admin123`                                         |
+| `CORS_ORIGINS`      | Origens permitidas (separadas por vírgula) | `http://localhost:3000`                         |
 
-> ⚠️ Em produção, **sempre** defina `JWT_SECRET`, `ADMIN_PASSWORD` e credenciais do banco via variáveis de ambiente — nunca deixe os valores padrão.
+> ⚠️ Em produção, **sempre** defina `JWT_SECRET` e `ADMIN_PASSWORD` via variáveis de ambiente — nunca deixe os valores padrão.
 
 ## Como rodar
 
+Em um terminal
 ```bash
-./mvnw spring-boot:run
+cd frontend/
+npm install
+npm run dev
 ```
 
-A aplicação sobe em `http://localhost:8080`.
+Em outro terminal
+```bash
+mvn clean spring-boot:run
+```
+
+Front sobe em `http://localhost:3000`.
+Back sobe em `http://localhost:8080`.
 
 ---
 
@@ -127,6 +124,7 @@ http://localhost:8080/swagger-ui/index.html
   "imageUrl": "https://exemplo.com/imagem.jpg",
   "price": 50.00,
   "availableTickets": 200,
+  "totalTickets": 200,
   "eventDate": "2026-12-31T21:00"
 }
 ```
@@ -140,6 +138,7 @@ http://localhost:8080/swagger-ui/index.html
   "imageUrl": "https://exemplo.com/imagem.jpg",
   "price": 50.00,
   "availableTickets": 200,
+  "totalTickets": 200,
   "eventDate": "2026-12-31T21:00",
   "status": "CONFIRMED"
 }
@@ -151,7 +150,6 @@ http://localhost:8080/swagger-ui/index.html
 
 | Status      | Descrição                              |
 |-------------|----------------------------------------|
-| `PENDING`   | Criado, aguardando confirmação         |
 | `CONFIRMED` | Confirmado                             |
 | `CANCELLED` | Cancelado — não pode mais ser editado  |
 
@@ -159,17 +157,13 @@ http://localhost:8080/swagger-ui/index.html
 
 | De          | Para        | Permitido |
 |-------------|-------------|-----------|
-| `PENDING`   | `CONFIRMED` | ✅        |
-| `PENDING`   | `CANCELLED` | ✅        |
 | `CONFIRMED` | `CANCELLED` | ✅        |
-| `CONFIRMED` | `PENDING`   | ❌        |
 | `CANCELLED` | qualquer    | ❌        |
 
 ---
 
 ## Regras de negócio
 
-- Evento novo sempre inicia com status `PENDING`
 - Não é possível editar ou alterar status de evento `CANCELLED`
 - Não é possível excluir evento `CONFIRMED`
 - Não é possível criar ou editar evento com data no passado
@@ -209,3 +203,8 @@ Clique na imagem abaixo abaixo para visualizar.
 👉 **[Demo](https://youtu.be/NRYEwl3QbmU)**
 👉 **[Demo Atualizado](https://youtu.be/utxvWNN2sRo)**
 ![Bug Tracker Interface](https://i.ibb.co/vx4HFTZy/Screenshot-20260427-231423.png)
+
+# Entrega 4
+## 📺  Screencast
+👉 **[Demo](https://youtu.be/Gz2S_dx1HoU)**
+![Bug Tracker Interface](https://i.ibb.co/F4ZGWJZg/Screenshot-20260518-174017.png)
