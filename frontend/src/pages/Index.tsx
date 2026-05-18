@@ -61,6 +61,10 @@ function Shell() {
             showToast("Faça login para comprar ingressos.");
             return;
         }
+        if (isAdmin) {
+            showToast("Administradores não podem comprar ingressos.");
+            return;
+        }
         showToast(`🎟️ Redirecionando para compra: ${evento.nome}`);
     };
 
@@ -202,10 +206,15 @@ function Shell() {
                 <EventDetailPage
                     evento={eventoSelecionado}
                     onVoltar={() => setPage("eventos")}
+                    isAdmin={isAdmin}
                     onComprar={(ev, qtd) => {
                         if (!isAuthenticated) {
                             setLoginOpen(true);
                             showToast("Faça login para comprar ingressos.");
+                            return;
+                        }
+                        if (isAdmin) {
+                            showToast("Administradores não podem comprar ingressos.");
                             return;
                         }
                         setIngressoCompra({ evento: ev, quantidade: qtd });

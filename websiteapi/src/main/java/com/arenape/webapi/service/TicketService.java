@@ -51,6 +51,10 @@ public class TicketService {
         User buyer = userRepository.findByEmail(buyerEmail)
                 .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado"));
 
+        if (buyer.getRole() == com.arenape.webapi.entity.enums.UserRole.ADMIN) {
+            throw new BusinessException("Administradores não podem comprar ingressos");
+        }
+
         event.setAvailableTickets(event.getAvailableTickets() - request.quantity());
         eventRepository.save(event);
 

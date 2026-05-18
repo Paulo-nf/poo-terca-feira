@@ -6,9 +6,10 @@ interface EventDetailPageProps {
   evento: Evento;
   onVoltar: () => void;
   onComprar: (evento: Evento, quantidade: number) => void;
+  isAdmin?: boolean;
 }
 
-export function EventDetailPage({ evento, onVoltar, onComprar }: EventDetailPageProps) {
+export function EventDetailPage({ evento, onVoltar, onComprar, isAdmin = false }: EventDetailPageProps) {
   const cat = CATEGORIES[evento.categoria] || CATEGORIES.CULTURAL;
   const { day, month, year } = formatDate(evento.data);
   const status = getTicketStatus(evento.ingressosDisponiveis);
@@ -140,11 +141,11 @@ export function EventDetailPage({ evento, onVoltar, onComprar }: EventDetailPage
             </div>
 
             <button
-              disabled={quantidade === 0 || status.esgotado || isPast}
+              disabled={quantidade === 0 || status.esgotado || isPast || isAdmin}
               onClick={() => onComprar(evento, quantidade)}
               className="w-full py-3 rounded-[12px] text-[14px] font-extrabold bg-blue text-primary-foreground tracking-wide hover:bg-blue-dark hover:scale-[1.01] transition-all duration-200 disabled:bg-muted disabled:text-muted-foreground disabled:cursor-not-allowed disabled:hover:scale-100"
             >
-              {isPast ? "Evento encerrado" : status.esgotado ? "Esgotado" : "Comprar ingressos"}
+              {isPast ? "Evento encerrado" : status.esgotado ? "Esgotado" : isAdmin ? "Indisponível para admins" : "Comprar ingressos"}
             </button>
           </aside>
         </div>
