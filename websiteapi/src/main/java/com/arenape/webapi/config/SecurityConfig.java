@@ -41,6 +41,7 @@ public class SecurityConfig {
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
                         .requestMatchers("/auth/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/events", "/events/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/events/*/vote").permitAll()
                         .requestMatchers(HttpMethod.POST, "/events").hasAuthority("ROLE_ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/events/**").hasAuthority("ROLE_ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/events/**").hasAuthority("ROLE_ADMIN")

@@ -47,6 +47,8 @@ public class Event {
     @Enumerated(EnumType.STRING)
     private EventStatus status;
 
+    private Integer votes;
+
     public Event() {
     }
 
@@ -70,6 +72,9 @@ public class Event {
         }
         if (totalTickets == null) {
             totalTickets = availableTickets;
+        }
+        if (votes == null) {
+            votes = 0;
         }
     }
 
@@ -158,5 +163,13 @@ public class Event {
 
     public void setStatus(EventStatus status) {
         this.status = status;
+    }
+
+    public Integer getVotes() {
+        return votes;
+    }
+
+    public void setVotes(Integer votes) {
+        this.votes = votes;
     }
 }

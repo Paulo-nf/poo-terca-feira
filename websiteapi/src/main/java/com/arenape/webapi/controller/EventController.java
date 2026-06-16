@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/events")
@@ -30,6 +31,11 @@ public class EventController {
     public ApiResponseDTO<EventResponseDTO> createEvent(@RequestBody @Valid EventRequestDTO request) {
         EventResponseDTO evento = service.create(request);
         return new ApiResponseDTO<>("Evento criado com sucesso!", evento);
+    }
+
+    @PostMapping("/{id}/vote")
+    public Map<String, Integer> vote(@PathVariable Long id) {
+        return Map.of("votes", service.vote(id));
     }
 
     @GetMapping

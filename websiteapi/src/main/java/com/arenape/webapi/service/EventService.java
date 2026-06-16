@@ -36,6 +36,13 @@ public class EventService {
         return toDTO(repository.save(event));
     }
 
+    public int vote(Long id) {
+        Event event = repository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Evento não encontrado com id: " + id));
+        event.setVotes((event.getVotes() == null ? 0 : event.getVotes()) + 1);
+        return repository.save(event).getVotes();
+    }
+
     public List<EventResponseDTO> findAll() {
         return repository.findAll().stream()
                 .map(this::toDTO)
