@@ -1,7 +1,7 @@
 # Esteira de CI do Arena PE (monorepo: frontend + websiteapi)
 # Estágios: build-test -> package -> deploy-stg
 # Roda a cada push e pull_request; o deploy só ocorre na branch principal (main).
-name: CI
+name: CI/CD
 
 on:
   push:
@@ -120,18 +120,63 @@ jobs:
 
   # ───────────────────────────── ESTÁGIO 3: deploy-stg ─────────────────────────────
   # Depende do package. Só roda em push na branch principal (main).
+  # Publica o frontend (estáticos do Vite) no GitHub Pages.
   deploy-stg:
-    name: Deploy (staging)
+    name: Deploy frontend (GitHub Pages)
     needs: package
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     runs-on: ubuntu-latest
-    environment: staging
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - name: Implantar no ambiente de staging
-        # Placeholder: substitua pelo comando real de deploy do seu provedor
-        # (ex.: kubectl set image / docker compose pull && up / fly deploy / etc.).
+      - uses: actions/checkout@v4
+
+      - name: Configurar Node 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Instalar dependências
+        working-directory: frontend
+        run: npm ci
+
+      - name: Build para o GitHub Pages
+        working-directory: frontend
+        # Project page é servida sob /<repo>/, então o Vite precisa desse base.
+        env:
+          VITE_BASE: /${{ github.event.repository.name }}/
+        run: npm run build
+
+      - name: Fallback de SPA (404 -> index.html)
+        # Pages não tem rewrite; copiar o index para 404.html evita erro em deep links.
+        run: cp frontend/dist/index.html frontend/dist/404.html
+
+      - name: Configurar Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload do artefato estático
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: frontend/dist
+
+      - name: Publicar no GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+      # Informa que o deploy foi feito para testar e mostra o link da página criada.
+      - name: Aviso de deploy de teste
         run: |
-          echo "Implantando imagens em staging a partir do commit ${GITHUB_SHA}..."
-          echo "  - ${REGISTRY}/${IMAGE_PREFIX}/websiteapi:sha-$(echo ${GITHUB_SHA} | cut -c1-7)"
-          echo "  - ${REGISTRY}/${IMAGE_PREFIX}/frontend:sha-$(echo ${GITHUB_SHA} | cut -c1-7)"
-          echo "TODO: integrar com a infraestrutura de staging real."
+          echo "Deploy realizado para testar o deploy."
+          echo "Acesse a página publicada: ${{ steps.deployment.outputs.page_url }}"
+          {
+            echo "### Deploy de teste concluído :rocket:"
+            echo "Deploy realizado para testar o deploy."
+            echo "Página publicada: ${{ steps.deployment.outputs.page_url }}"
+          } >> "$GITHUB_STEP_SUMMARY"
