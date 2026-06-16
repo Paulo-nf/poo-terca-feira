@@ -120,7 +120,10 @@ jobs:
 
   # ───────────────────────────── ESTÁGIO 3: deploy-stg ─────────────────────────────
   # Depende do package. Só roda em push na branch principal (main).
-  # Publica o frontend (estáticos do Vite) no GitHub Pages.
+  # Publica o frontend (estáticos do Vite) no
+  # GitHub Pages (https://paulo-nf.github.io/poo-terca-freira/) para mostrar que
+  # a pipeline esta funcionando, o container não é deployed mas é testado em
+  # outros testes.
   deploy-stg:
     name: Deploy frontend (GitHub Pages)
     needs: package
@@ -169,14 +172,3 @@ jobs:
       - name: Publicar no GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
-
-      # Informa que o deploy foi feito para testar e mostra o link da página criada.
-      - name: Aviso de deploy de teste
-        run: |
-          echo "Deploy realizado para testar o deploy."
-          echo "Acesse a página publicada: ${{ steps.deployment.outputs.page_url }}"
-          {
-            echo "### Deploy de teste concluído :rocket:"
-            echo "Deploy realizado para testar o deploy."
-            echo "Página publicada: ${{ steps.deployment.outputs.page_url }}"
-          } >> "$GITHUB_STEP_SUMMARY"
