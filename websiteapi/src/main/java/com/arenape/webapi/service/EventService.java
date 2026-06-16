@@ -37,8 +37,7 @@ public class EventService {
     }
 
     public int vote(Long id) {
-        Event event = repository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Evento não encontrado com id: " + id));
+        Event event = findEventById(id);
         event.setVotes((event.getVotes() == null ? 0 : event.getVotes()) + 1);
         return repository.save(event).getVotes();
     }
@@ -100,6 +99,7 @@ public class EventService {
                 event.getAvailableTickets(),
                 event.getTotalTickets(),
                 event.getStatus().name(),
+                event.getVotes() == null ? 0 : event.getVotes(),
                 event.getEventDate());
     }
 }

@@ -31,6 +31,7 @@ export interface Evento {
   preco: number;
   imagemUrl: string | null;
   status: string;           // PENDING | CONFIRMED | CANCELLED (vindo do back)
+  votos: number;            // votos na enquete "próximo evento"
 }
 
 /** Shape esperado vindo do back Spring Boot. */
@@ -45,10 +46,11 @@ export interface EventResponseDTO {
   imageUrl?: string | null;
   category?: string | null; // se um dia o back passar a mandar
   status?: string | null;
+  votes?: number | null;
 }
 
 export const FALLBACK_EVENTOS: Evento[] = [
-  { id: 1, nome: "Show do João Gomes", data: "2026-06-24", categoria: "SHOW", descricao: "Gravação do novo DVD do João Gomes na Arena Pernambuco.", ingressosDisponiveis: 32500, totalIngressos: 45000, preco: 120, imagemUrl: null, status: "CONFIRMED" },
-  { id: 2, nome: "Sport x Náutico — Final Pernambucano", data: "2026-04-15", categoria: "ESPORTE", descricao: "Grande final do Campeonato Pernambucano na Arena.", ingressosDisponiveis: 0, totalIngressos: 45000, preco: 80, imagemUrl: null, status: "CONFIRMED" },
-  { id: 3, nome: "Exposição de Arte Armorial", data: "2026-07-05", categoria: "CULTURAL", descricao: "Exposição em homenagem a Ariano Suassuna.", ingressosDisponiveis: 4880, totalIngressos: 5000, preco: 0, imagemUrl: null, status: "CONFIRMED" },
+  { id: 1, nome: "Show do João Gomes", data: "2026-06-24", categoria: "SHOW", descricao: "Gravação do novo DVD do João Gomes na Arena Pernambuco.", ingressosDisponiveis: 32500, totalIngressos: 45000, preco: 120, imagemUrl: null, status: "CONFIRMED", votos: 0 },
+  { id: 2, nome: "Sport x Náutico — Final Pernambucano", data: "2026-04-15", categoria: "ESPORTE", descricao: "Grande final do Campeonato Pernambucano na Arena.", ingressosDisponiveis: 0, totalIngressos: 45000, preco: 80, imagemUrl: null, status: "CONFIRMED", votos: 0 },
+  { id: 3, nome: "Exposição de Arte Armorial", data: "2026-07-05", categoria: "CULTURAL", descricao: "Exposição em homenagem a Ariano Suassuna.", ingressosDisponiveis: 4880, totalIngressos: 5000, preco: 0, imagemUrl: null, status: "CONFIRMED", votos: 0 },
 ];

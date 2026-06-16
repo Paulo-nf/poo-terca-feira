@@ -16,6 +16,7 @@ import { EventDetailPage } from "@/components/arena/EventDetailPage";
 import { PaymentPage } from "@/components/arena/PaymentPage";
 import { MyTicketsPage } from "@/components/arena/MyTicketsPage";
 import { type TicketDTO } from "@/lib/tickets-api";
+import { votarEvento } from "@/lib/events-api";
 
 function Shell() {
     const [page, setPage] = useState("home");
@@ -66,6 +67,18 @@ function Shell() {
             return;
         }
         showToast(`🎟️ Redirecionando para compra: ${evento.nome}`);
+    };
+
+    const handleVotar = async (evento: Evento) => {
+        try {
+            const votos = await votarEvento(evento.id);
+            setEventos((prev) =>
+                prev.map((e) => (e.id === evento.id ? { ...e, votos } : e))
+            );
+            showToast(`✅ Voto registrado em "${evento.nome}"!`);
+        } catch (error) {
+            showToast(error instanceof Error ? error.message : "Erro ao votar.");
+        }
     };
 
     const handleSelectEvento = (evento: Evento) => {
@@ -193,6 +206,7 @@ function Shell() {
                     eventos={eventos}
                     loading={loading}
                     onComprar={handleComprar}
+                    onVotar={handleVotar}
                     onSelectEvento={handleSelectEvento}
                     setPage={setPage}
                     enqueteVisivel={enqueteVisivel}

@@ -49,5 +49,6 @@ export function mapEvento(dto: any): Evento {
         data: dto.eventDate,
         categoria: inferCategoria(dto),
         status: dto.status ?? "PENDING",
+        votos: dto.votes ?? 0,
     };
 }

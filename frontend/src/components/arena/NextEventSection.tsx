@@ -7,18 +7,26 @@ interface NextEventSectionProps {
   eventos: Evento[];
   loading: boolean;
   onComprar: (evento: Evento) => void;
+  onVotar: (evento: Evento) => void;
   enqueteVisivel: boolean;
   enqueteIds: number[];
 }
+
+const VOTO_STORAGE_KEY = "arena_enquete_voto";
 
 export function NextEventSection({
   eventos,
   loading,
   onComprar,
+  onVotar,
   enqueteVisivel,
   enqueteIds,
 }: NextEventSectionProps) {
-  const [voted, setVoted] = useState<number | null>(null);
+  // Lembra em qual evento este navegador já votou (1 voto por navegador).
+  const [voted, setVoted] = useState<number | null>(() => {
+    const raw = localStorage.getItem(VOTO_STORAGE_KEY);
+    return raw ? Number(raw) : null;
+  });
 
   const proximo =
     eventos.find((e) => !getTicketStatus(e.ingressosDisponiveis).esgotado) || eventos[0];
@@ -39,6 +47,16 @@ export function NextEventSection({
   // Se a enquete estiver oculta ou sem itens, só exibe o countdown
   const mostrarEnquete = enqueteVisivel && (loading || enqueteEventos.length > 0);
 
+  const jaVotou = voted !== null;
+  const totalVotos = enqueteEventos.reduce((soma, e) => soma + (e.votos || 0), 0);
+
+  const handleVote = (e: Evento) => {
+    if (loading || jaVotou) return;
+    onVotar(e);
+    setVoted(e.id);
+    localStorage.setItem(VOTO_STORAGE_KEY, String(e.id));
+  };
+
   return (
     <section className="px-12 py-[72px] max-md:px-5 max-md:py-14">
       <div className="mb-9">
@@ -46,7 +64,9 @@ export function NextEventSection({
         <h2 className="font-heading text-[clamp(22px,2.8vw,32px)] font-black tracking-tight text-blue-dark mb-1.5">
           Próximo Evento
         </h2>
-        <p className="text-[15px] text-muted-foreground">Escolha o próximo evento que você deseja.</p>
+        <p className="text-[15px] text-muted-foreground">
+          {jaVotou ? "Obrigado por votar! Veja como está a enquete." : "Escolha o próximo evento que você deseja."}
+        </p>
       </div>
 
       <div className={`grid gap-9 items-center max-md:grid-cols-1 ${mostrarEnquete ? "grid-cols-2" : "grid-cols-1 max-w-md"}`}>
@@ -54,33 +74,49 @@ export function NextEventSection({
         {mostrarEnquete && (
           <div>
             <div className="flex flex-col gap-2.5">
-              {enqueteEventos.map((e) => (
-                <div
-                  key={e.id}
-                  onClick={() => !loading && setVoted(e.id)}
-                  className={`flex items-center gap-3.5 bg-card border-[1.5px] rounded-xl p-3.5 px-[18px] cursor-pointer transition-all duration-200 shadow-sm ${
-                    voted === e.id
-                      ? "border-blue bg-blue-light"
-                      : "border-border hover:border-blue/30 hover:bg-blue-light"
-                  }`}
-                >
+              {enqueteEventos.map((e) => {
+                const selecionado = voted === e.id;
+                const pct = totalVotos > 0 ? Math.round(((e.votos || 0) / totalVotos) * 100) : 0;
+                return (
                   <div
-                    className={`w-[18px] h-[18px] rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-colors ${
-                      voted === e.id ? "border-blue" : "border-border"
+                    key={e.id}
+                    onClick={() => handleVote(e)}
+                    className={`relative overflow-hidden flex items-center gap-3.5 bg-card border-[1.5px] rounded-xl p-3.5 px-[18px] transition-all duration-200 shadow-sm ${
+                      jaVotou ? "cursor-default" : "cursor-pointer"
+                    } ${
+                      selecionado
+                        ? "border-blue bg-blue-light"
+                        : `border-border ${!jaVotou && "hover:border-blue/30 hover:bg-blue-light"}`
                     }`}
                   >
-                    {voted === e.id && <div className="w-2 h-2 rounded-full bg-blue" />}
-                  </div>
-                  <div>
-                    <p className="font-bold text-sm text-blue-dark">{e.nome || "..."}</p>
-                    {e.categoria && (
-                      <p className="text-xs text-muted-foreground">
-                        {CATEGORIES[e.categoria]?.emoji} {CATEGORIES[e.categoria]?.label}
-                      </p>
+                    {/* Barra de resultado — só após votar */}
+                    {jaVotou && (
+                      <div
+                        className="absolute inset-y-0 left-0 bg-blue/10 transition-all duration-500"
+                        style={{ width: `${pct}%` }}
+                      />
+                    )}
+                    <div
+                      className={`relative w-[18px] h-[18px] rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-colors ${
+                        selecionado ? "border-blue" : "border-border"
+                      }`}
+                    >
+                      {selecionado && <div className="w-2 h-2 rounded-full bg-blue" />}
+                    </div>
+                    <div className="relative flex-1">
+                      <p className="font-bold text-sm text-blue-dark">{e.nome || "..."}</p>
+                      {e.categoria && (
+                        <p className="text-xs text-muted-foreground">
+                          {CATEGORIES[e.categoria]?.emoji} {CATEGORIES[e.categoria]?.label}
+                        </p>
+                      )}
+                    </div>
+                    {jaVotou && (
+                      <span className="relative text-sm font-extrabold text-blue-dark flex-shrink-0">{pct}%</span>
                     )}
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
 
             {!loading && (
@@ -95,7 +131,7 @@ export function NextEventSection({
                     </div>
                   ))}
                 </div>
-                +130 votaram
+                {totalVotos} {totalVotos === 1 ? "voto" : "votos"}
               </div>
             )}
           </div>

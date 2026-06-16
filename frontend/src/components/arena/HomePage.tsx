@@ -9,6 +9,7 @@ interface HomePageProps {
   eventos: Evento[];
   loading: boolean;
   onComprar: (evento: Evento) => void;
+  onVotar: (evento: Evento) => void;
   onSelectEvento?: (evento: Evento) => void;
   setPage: (page: string) => void;
   enqueteVisivel: boolean;
@@ -19,6 +20,7 @@ export function HomePage({
   eventos,
   loading,
   onComprar,
+  onVotar,
   onSelectEvento,
   setPage,
   enqueteVisivel,
@@ -71,6 +73,7 @@ export function HomePage({
         eventos={eventos}
         loading={loading}
         onComprar={onComprar}
+        onVotar={onVotar}
         enqueteVisivel={enqueteVisivel}
         enqueteIds={enqueteIds}
       />
