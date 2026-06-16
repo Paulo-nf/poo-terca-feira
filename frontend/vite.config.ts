@@ -5,6 +5,9 @@ import { componentTagger } from "lovable-tagger";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
+  // Caminho base. Em dev fica "/"; no deploy do GitHub Pages (project page)
+  // o site é servido sob "/<repo>/", definido via env VITE_BASE no workflow.
+  base: process.env.VITE_BASE || "/",
   server: {
     host: "::",
     port: 3000,
